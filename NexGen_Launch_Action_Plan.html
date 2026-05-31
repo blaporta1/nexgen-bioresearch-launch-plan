@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexGen Bioresearch — Launch Action Plan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1B2A4A;
+    --mid-blue: #2E4A7A;
+    --teal: #17A589;
+    --teal-light: #E1F5EE;
+    --gold: #D4AC0D;
+    --gold-light: #FAEEDA;
+    --light-gray: #F8F9FA;
+    --border: #E2E8F0;
+    --text: #1A202C;
+    --text-muted: #64748B;
+    --white: #FFFFFF;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #F1F5F9;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; }
+
+  /* Hero */
+  .hero {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 2rem 2.25rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+  .hero-title { color: #fff; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .hero-sub { color: #9FB3D4; font-size: 13px; margin-top: 4px; }
+  .kpi-strip { display: flex; gap: 10px; flex-wrap: wrap; }
+  .kpi {
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 8px;
+    padding: 8px 14px;
+    text-align: center;
+    min-width: 76px;
+  }
+  .kpi-val { color: #fff; font-size: 15px; font-weight: 600; }
+  .kpi-lbl { color: #9FB3D4; font-size: 11px; margin-top: 2px; }
+
+  /* Global progress */
+  .global-progress {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .gp-label { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+  .gp-track { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .gp-fill { height: 100%; background: var(--teal); border-radius: 99px; width: 0%; transition: width 0.3s; }
+  .gp-count { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  /* Phase cards */
+  .phase-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .phase-header:hover { background: var(--light-gray); }
+
+  .phase-num {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+    color: #fff;
+  }
+
+  .phase-meta { flex: 1; }
+  .phase-name { font-weight: 600; font-size: 14px; }
+  .phase-range { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .phase-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  .chevron {
+    font-size: 18px;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .phase-card.open .chevron { transform: rotate(180deg); }
+
+  .phase-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .phase-card.open .phase-body { display: block; }
+
+  .week-block { padding: 14px 20px; }
+  .week-block + .week-block { border-top: 1px solid var(--border); }
+
+  .week-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .task-list { display: flex; flex-direction: column; gap: 7px; }
+
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 7px;
+    transition: background 0.1s;
+  }
+  .task-row:hover { background: var(--light-gray); }
+
+  .task-check {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid #CBD5E1;
+    flex-shrink: 0;
+    margin-top: 1px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .task-check.done { background: var(--teal); border-color: var(--teal); }
+  .task-check.done::after {
+    content: '';
+    width: 10px; height: 6px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translateY(-1px);
+    display: block;
+  }
+
+  .task-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .task-text.done { color: var(--text-muted); text-decoration: line-through; }
+
+  .task-tag {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  /* Progress footer */
+  .progress-bar-wrap {
+    background: var(--light-gray);
+    border-top: 1px solid var(--border);
+    padding: 11px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .progress-track { flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--teal); border-radius: 99px; width: 0%; transition: width 0.3s; }
+  .progress-pct { font-size: 12px; font-weight: 600; color: var(--text-muted); min-width: 36px; text-align: right; }
+
+  /* Summary row */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 1.25rem;
+  }
+  .sum-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .sum-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .sum-val { font-size: 14px; font-weight: 600; }
+  .sum-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2rem;
+    padding-bottom: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .hero { flex-direction: column; }
+    .phase-badges { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div>
+      <div class="hero-title">NexGen Bioresearch — Launch Action Plan</div>
+      <div class="hero-sub">90-day blueprint from entity formation to public launch</div>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi"><div class="kpi-val">$165K</div><div class="kpi-lbl">Capital target</div></div>
+      <div class="kpi"><div class="kpi-val">90</div><div class="kpi-lbl">Days to launch</div></div>
+      <div class="kpi"><div class="kpi-val">11</div><div class="kpi-lbl">SKUs</div></div>
+      <div class="kpi"><div class="kpi-val">4</div><div class="kpi-lbl">Phases</div></div>
+    </div>
+  </div>
+
+  <div class="global-progress">
+    <span class="gp-label">Overall progress</span>
+    <div class="gp-track"><div class="gp-fill" id="global-fill"></div></div>
+    <span class="gp-count" id="global-count">0 / 0 tasks</span>
+  </div>
+
+  <div id="phases"></div>
+
+  <div class="summary-row">
+    <div class="sum-card">
+      <span class="sum-icon">🏛️</span>
+      <div><div class="sum-val">Wyoming LLC</div><div class="sum-lbl">Recommended entity</div></div>
+    </div>
+    <div class="sum-card">
+      <span class="sum-icon">🛡️</span>
+      <div><div class="sum-val">3 processors</div><div class="sum-lbl">Payment redundancy</div></div>
+    </div>
+    <div class="sum-card">
+      <span class="sum-icon">🛒</span>
+      <div><div class="sum-val">Shopify Plus</div><div class="sum-lbl">Platform</div></div>
+    </div>
+    <div class="sum-card">
+      <span class="sum-icon">🔬</span>
+      <div><div class="sum-val">ISO 17025 labs</div><div class="sum-lbl">Third-party COA testing</div></div>
+    </div>
+    <div class="sum-card">
+      <span class="sum-icon">🚀</span>
+      <div><div class="sum-val">Day 90</div><div class="sum-lbl">Public launch date</div></div>
+    </div>
+  </div>
+
+  <p class="footer-note">NexGen Bioresearch &nbsp;|&nbsp; Confidential — For Internal Use Only &nbsp;|&nbsp; May 2026</p>
+</div>
+
+<script>
+const phases = [
+  {
+    name: "Phase 1 — Foundation & Legal",
+    range: "Days 1 – 20",
+    color: "#1B2A4A",
+    badgeBg: "#DBEAFE", badgeTxt: "#1E40AF",
+    badges: ["Legal", "Banking", "Insurance"],
+    weeks: [
+      { label: "Week 1 (Days 1–7)", tasks: [
+        { text: "File Wyoming LLC Articles of Organization online — $100 filing fee at wyomingsos.gov", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Appoint registered agent (Northwest Registered Agent or Registered Agents Inc. — ~$50–150/yr)", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Apply for EIN at IRS.gov — free and instant online, no attorney needed", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Open Mercury Bank business checking account (no fees, startup-friendly)", tag: "Banking", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Retain regulatory attorney — begin Operating Agreement draft with compliance provisions", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+      ]},
+      { label: "Week 2 (Days 8–14)", tasks: [
+        { text: "Initiate USPTO trademark filing for brand name + logo — Class 1 (Chemicals), $250–350 per class", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Obtain product liability insurance quotes ($2M minimum — Hiscox, Markel, or Philadelphia Insurance)", tag: "Insurance", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Obtain General Liability + BOP quotes; bundle for cost savings", tag: "Insurance", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Obtain cyber liability insurance quote — required for eCommerce before launch", tag: "Insurance", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Register for sales tax permit in home state; evaluate economic nexus thresholds in top markets", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+      ]},
+      { label: "Week 3 (Days 15–20)", tasks: [
+        { text: "Bind all insurance policies — do NOT proceed with inventory purchasing without coverage in place", tag: "Insurance", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Set up QuickBooks Online Plus; hire bookkeeper ($300–600/month)", tag: "Ops", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Apply for DUNS number at Dnb.com (free) to begin building business credit", tag: "Banking", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Apply for high-risk merchant accounts — Easy Pay Direct AND Durango simultaneously", tag: "Payments", tagBg: "#FEE2E2", tagTxt: "#991B1B" },
+        { text: "Apply for third merchant account backup — PaymentCloud; set up BitPay crypto gateway", tag: "Payments", tagBg: "#FEE2E2", tagTxt: "#991B1B" },
+      ]},
+    ]
+  },
+  {
+    name: "Phase 2 — Sourcing & Branding",
+    range: "Days 21 – 45",
+    color: "#2E4A7A",
+    badgeBg: "#D1FAE5", badgeTxt: "#065F46",
+    badges: ["Supplier", "Brand", "Label"],
+    weeks: [
+      { label: "Week 4 (Days 21–28)", tasks: [
+        { text: "Contact 8–10 cGMP-certified peptide manufacturers — request facility certs, sample COAs, pricing, MOQs", tag: "Supplier", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Build supplier scorecard: cGMP cert, COA quality, communication speed, lead time, pricing, reference checks", tag: "Supplier", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Engage brand designer — define logo concepts, scientific aesthetic, color palette, and brand voice", tag: "Brand", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+        { text: "Write creative brief: 'scientific journal aesthetic, not supplement marketing' — premium and research-first", tag: "Brand", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+      ]},
+      { label: "Week 5 (Days 29–35)", tasks: [
+        { text: "Select primary manufacturer + one backup — execute supplier agreements with attorney review", tag: "Supplier", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Place initial inventory order for all 11 SKUs — typical lead time 3–5 weeks from cGMP manufacturers", tag: "Supplier", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Finalize brand identity: logo approved, color system locked, typography selected", tag: "Brand", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+        { text: "Order label printer — Zebra ZD421 thermal transfer ($400–600); order cryogenic polyester label stock", tag: "Label", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Install BarTender or ZebraDesigner for variable-data label printing (lot#, expiry, purity%)", tag: "Label", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+      ]},
+      { label: "Week 6 (Days 36–45)", tasks: [
+        { text: "Build compliant label templates for all 11 SKUs — include: peptide name, purity %, lot#, expiry, storage conditions, QR code, 'FOR RESEARCH USE ONLY' in largest text", tag: "Label", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Attorney review of all label copy before printing — mandatory step, no exceptions", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Write all website copy with attorney review — TOS, Privacy Policy, footer disclaimer, checkout attestation", tag: "Legal", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Order lab equipment: primary refrigerator, backup refrigerator, -20C freezer, Wi-Fi temp monitoring system", tag: "Lab", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Order PPE, laminar flow hood, precision scale (0.001g), pipettes, spill kits, NSF-rated shelving", tag: "Lab", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+      ]},
+    ]
+  },
+  {
+    name: "Phase 3 — Build & Setup",
+    range: "Days 46 – 70",
+    color: "#17A589",
+    badgeBg: "#FEF3C7", badgeTxt: "#92400E",
+    badges: ["Website", "Lab", "Inventory"],
+    weeks: [
+      { label: "Week 7–8 (Days 46–58)", tasks: [
+        { text: "Launch Shopify Plus store build — install high-risk payment gateway, age verification, mandatory checkout attestation", tag: "Website", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Build COA database: searchable by lot#, peptide, and batch date; each entry linked to downloadable COA PDF", tag: "Website", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Build customer portal: order history with linked COAs, reorder functionality, tech support ticket submission", tag: "Website", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Set up Klaviyo CRM — build: welcome sequence, reorder sequence, back-in-stock flows; attorney review all copy", tag: "Website", tagBg: "#DBEAFE", tagTxt: "#1E40AF" },
+        { text: "Set up ShipStation with FedEx Priority Overnight + UPS Next Day Air; configure no-PO-box shipping rules", tag: "Ops", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Lab equipment arrives — install and calibrate temp monitoring; log baseline readings for 5 days", tag: "Lab", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+      ]},
+      { label: "Week 9–10 (Days 59–70)", tasks: [
+        { text: "Inventory arrives — QUARANTINE immediately; do not label until third-party COA testing is complete (5–10 business days)", tag: "Inventory", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Send samples to ISO 17025-accredited third-party lab — HPLC, mass spectrometry, endotoxin testing for all 11 SKUs", tag: "Inventory", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Third-party COA results arrive — verify purity vs spec (>98%); reject failing batches; contact supplier immediately", tag: "Inventory", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Generate lot numbers for approved batches (NG-[SKU]-[YYMMDD]-[SEQ]); enter into COA database", tag: "Inventory", tagBg: "#FEF3C7", tagTxt: "#92400E" },
+        { text: "Print labels using approved templates; scan each QR code to verify it routes to correct COA lot page", tag: "Label", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Apply labels in laminar flow hood with gloves; photograph each labeled batch; store in primary refrigerator", tag: "Lab", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Order shipping supplies: insulated shippers, cryogenic gel packs, SpotSee WarmMark temperature indicators", tag: "Ops", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+      ]},
+    ]
+  },
+  {
+    name: "Phase 4 — Pre-Launch & Go-Live",
+    range: "Days 71 – 90",
+    color: "#B45309",
+    badgeBg: "#FEE2E2", badgeTxt: "#991B1B",
+    badges: ["Marketing", "QA", "Launch"],
+    weeks: [
+      { label: "Week 11 (Days 71–77)", tasks: [
+        { text: "Full QA pass on website: test checkout flow, attestation checkbox, payment processing, mobile responsiveness, all disclaimer language", tag: "QA", tagBg: "#FEE2E2", tagTxt: "#991B1B" },
+        { text: "Onboard 5–10 affiliate partners — require compliance training sign-off; set up Refersion or ShareASale tracking", tag: "Marketing", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+        { text: "Publish 5 educational blog posts (mechanism-of-action guides) — attorney review each piece; no medical claims", tag: "Marketing", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+        { text: "Set up Google Analytics 4, conversion tracking, and ad pixels — verify all fire correctly before ad spend", tag: "Marketing", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+      ]},
+      { label: "Week 12 (Days 78–84)", tasks: [
+        { text: "Soft launch to small group (10–25 people) — fulfill 5–10 test orders end-to-end; document every friction point", tag: "QA", tagBg: "#FEE2E2", tagTxt: "#991B1B" },
+        { text: "Resolve all soft-launch issues — complete team briefing on fulfillment SOP; run a timed fulfillment drill", tag: "QA", tagBg: "#FEE2E2", tagTxt: "#991B1B" },
+        { text: "Set up Postscript SMS — configure back-in-stock and reorder flows; opt-in only, no outbound blasts at launch", tag: "Marketing", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+        { text: "Publish 5 additional blog posts; activate social media accounts (LinkedIn, Reddit — scientific communities)", tag: "Marketing", tagBg: "#EDE9FE", tagTxt: "#4C1D95" },
+      ]},
+      { label: "Week 13 (Days 85–90)", tasks: [
+        { text: "Launch Google Search ads — research peptide keywords only; strict research-only ad copy reviewed by attorney", tag: "Launch", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Launch Reddit and Facebook educational content campaigns — no medical claims, no before/after, no dosing", tag: "Launch", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Final pre-launch checklist: all policies live, payment processing tested, inventory stocked, COA database live", tag: "Launch", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "DAY 90 — OFFICIAL PUBLIC LAUNCH. Monitor first 50 orders. Respond to all inquiries within 2 hours.", tag: "🚀 Go Live", tagBg: "#1B2A4A", tagTxt: "#ffffff" },
+        { text: "Post-launch week: A/B test ad creative, gather customer feedback, brief fulfillment on recurring issues", tag: "Launch", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+        { text: "Place first inventory reorder for BPC-157 and TB-500 based on early sales velocity — never stock out on star SKUs", tag: "Ops", tagBg: "#D1FAE5", tagTxt: "#065F46" },
+      ]},
+    ]
+  }
+];
+
+const container = document.getElementById('phases');
+const globalFill = document.getElementById('global-fill');
+const globalCount = document.getElementById('global-count');
+const allStates = [];
+
+function updateGlobal() {
+  const done = allStates.filter(s => s.checked).length;
+  const pct = allStates.length ? Math.round(done / allStates.length * 100) : 0;
+  globalFill.style.width = pct + '%';
+  globalCount.textContent = done + ' / ' + allStates.length + ' tasks';
+}
+
+phases.forEach((ph, pi) => {
+  const card = document.createElement('div');
+  card.className = 'phase-card' + (pi === 0 ? ' open' : '');
+
+  const badgesHtml = ph.badges.map(b =>
+    `<span class="badge" style="background:${ph.badgeBg};color:${ph.badgeTxt}">${b}</span>`
+  ).join('');
+
+  const header = document.createElement('div');
+  header.className = 'phase-header';
+  header.innerHTML = `
+    <div class="phase-num" style="background:${ph.color}">${pi+1}</div>
+    <div class="phase-meta">
+      <div class="phase-name">${ph.name}</div>
+      <div class="phase-range">${ph.range}</div>
+    </div>
+    <div class="phase-badges">${badgesHtml}</div>
+    <span class="chevron">&#8964;</span>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'phase-body';
+
+  const phaseStates = [];
+  const phaseFills = [];
+  let pctEl;
+
+  ph.weeks.forEach(wk => {
+    const wb = document.createElement('div');
+    wb.className = 'week-block';
+    const lbl = document.createElement('div');
+    lbl.className = 'week-label';
+    lbl.textContent = wk.label;
+    const tl = document.createElement('div');
+    tl.className = 'task-list';
+    wb.appendChild(lbl);
+    wb.appendChild(tl);
+
+    wk.tasks.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'task-row';
+
+      const chk = document.createElement('div');
+      chk.className = 'task-check';
+      chk.setAttribute('role', 'checkbox');
+      chk.setAttribute('aria-checked', 'false');
+      chk.setAttribute('tabindex', '0');
+
+      const txt = document.createElement('div');
+      txt.className = 'task-text';
+      txt.textContent = t.text;
+
+      const tag = document.createElement('span');
+      tag.className = 'task-tag';
+      tag.style.background = t.tagBg;
+      tag.style.color = t.tagTxt;
+      tag.textContent = t.tag;
+
+      const state = { checked: false };
+      allStates.push(state);
+      phaseStates.push(state);
+
+      function toggle() {
+        state.checked = !state.checked;
+        chk.setAttribute('aria-checked', state.checked);
+        chk.classList.toggle('done', state.checked);
+        txt.classList.toggle('done', state.checked);
+        const done = phaseStates.filter(s => s.checked).length;
+        const pct = phaseStates.length ? Math.round(done / phaseStates.length * 100) : 0;
+        phaseFills.forEach(f => f.style.width = pct + '%');
+        if (pctEl) pctEl.textContent = pct + '%';
+        updateGlobal();
+      }
+
+      chk.addEventListener('click', toggle);
+      chk.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
+
+      row.appendChild(chk);
+      row.appendChild(txt);
+      row.appendChild(tag);
+      tl.appendChild(row);
+    });
+
+    body.appendChild(wb);
+  });
+
+  const prog = document.createElement('div');
+  prog.className = 'progress-bar-wrap';
+  const track = document.createElement('div');
+  track.className = 'progress-track';
+  const fill = document.createElement('div');
+  fill.className = 'progress-fill';
+  phaseFills.push(fill);
+  track.appendChild(fill);
+  pctEl = document.createElement('span');
+  pctEl.className = 'progress-pct';
+  pctEl.textContent = '0%';
+  prog.appendChild(track);
+  prog.appendChild(pctEl);
+  body.appendChild(prog);
+
+  header.addEventListener('click', () => card.classList.toggle('open'));
+
+  card.appendChild(header);
+  card.appendChild(body);
+  container.appendChild(card);
+});
+
+updateGlobal();
+</script>
+</body>
+</html>
